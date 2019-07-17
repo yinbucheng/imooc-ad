@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.imooc.ad.common.config.ServerWebConfig,\
+  cn.imooc.ad.common.exception.ServerExceptionHandler,\
+  cn.imooc.ad.common.advice.ServerResponseAdvice
