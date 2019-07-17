@@ -59,6 +59,7 @@ public class AggregationListener implements BinaryLogClient.EventListener {
         EventType type = event.getHeader().getEventType();
         log.debug("event type: {}", type);
 
+        //在插入或者删除修改数据都会之前都会触发这个事件，由于binlog能保证多线程执行里面的顺序性所有可以通过成员变量来保证TableName和dbName
         if (type == EventType.TABLE_MAP) {
             TableMapEventData data = event.getData();
             this.tableName = data.getTable();
@@ -66,6 +67,7 @@ public class AggregationListener implements BinaryLogClient.EventListener {
             return;
         }
 
+        //如果binlog中的事件不是插入，修改，删除事件则直接返回
         if (type != EventType.EXT_UPDATE_ROWS
                 && type != EventType.EXT_WRITE_ROWS
                 && type != EventType.EXT_DELETE_ROWS) {
