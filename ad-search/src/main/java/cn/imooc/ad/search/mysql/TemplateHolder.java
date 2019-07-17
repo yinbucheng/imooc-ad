@@ -45,6 +45,7 @@ public class TemplateHolder {
         return template.getTableTemplateMap().get(tableName);
     }
 
+    //解析json数据并存放化表中索引和列名的对应关系
     private void loadJson(String path) {
 
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -64,6 +65,7 @@ public class TemplateHolder {
         }
     }
 
+    //解析表中索引和列名
     private void loadMeta() {
 
         for (Map.Entry<String, TableTemplate> entry :

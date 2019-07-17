@@ -34,6 +34,7 @@ public class AggregationListener implements BinaryLogClient.EventListener {
     private String dbName;
     private String tableName;
 
+    //binlog处理监听器集合
     private Map<String, Ilistener> listenerMap = new HashMap<>();
 
     private final TemplateHolder templateHolder;
@@ -47,6 +48,8 @@ public class AggregationListener implements BinaryLogClient.EventListener {
         return dbName + ":" + tableName;
     }
 
+
+    //根据库名和表名注册监听器
     public void register(String _dbName, String _tableName,
                          Ilistener ilistener) {
         log.info("register : {}-{}", _dbName, _tableName);

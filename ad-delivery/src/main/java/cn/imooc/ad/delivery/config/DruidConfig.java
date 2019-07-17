@@ -2,6 +2,7 @@ package cn.imooc.ad.delivery.config;
 
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * Created by yinchong
  */
 @Configuration
+@MapperScan(basePackages = {"cn.imooc.ad.delivery.dao"})
 public class DruidConfig {
 
 

@@ -34,6 +34,7 @@ public class IncrementListener implements Ilistener {
         this.aggregationListener = aggregationListener;
     }
 
+    //将所有的库和表注册上去，及当前处理类注册上去
     @Override
     @PostConstruct
     public void register() {

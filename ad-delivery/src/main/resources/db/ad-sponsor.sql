@@ -1,5 +1,5 @@
 -- imooc-ad 数据库
-drop DATABASE imooc_ad_data;
+#drop DATABASE imooc_ad_data;
 CREATE DATABASE imooc_ad_data character set utf8;
 
 use imooc_ad_data;
