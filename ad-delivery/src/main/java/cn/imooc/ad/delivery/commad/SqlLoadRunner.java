@@ -11,6 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.EncodedResource;
@@ -36,6 +37,7 @@ import java.util.List;
  * @version:
  */
 @Component
+@Order(-Integer.MAX_VALUE)
 public class SqlLoadRunner implements CommandLineRunner, EnvironmentAware, BeanFactoryAware, ApplicationContextAware {
 
     private Logger logger = LoggerFactory.getLogger(SqlLoadRunner.class);
