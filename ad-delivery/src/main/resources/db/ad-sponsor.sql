@@ -1,11 +1,11 @@
 -- imooc-ad 数据库
 #drop DATABASE imooc_ad_data;
-CREATE DATABASE imooc_ad_data character set utf8;
+#CREATE DATABASE imooc_ad_data character set utf8;
 
 use imooc_ad_data;
 
 -- 用户表
-CREATE TABLE `ad_user` (
+CREATE TABLE if not exists `ad_user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `username` varchar(128) NOT NULL DEFAULT '' COMMENT '用户名',
   `password` varchar(256) NOT NULL DEFAULT '' COMMENT '密码',
@@ -18,7 +18,7 @@ CREATE TABLE `ad_user` (
 
 
 -- 推广计划表
-CREATE TABLE `ad_plan` (
+CREATE TABLE if not exists `ad_plan` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `user_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '标记当前记录所属用户',
   `plan_name` varchar(48) NOT NULL COMMENT '推广计划名称',
@@ -32,7 +32,7 @@ CREATE TABLE `ad_plan` (
 
 
 -- 推广单元表
-CREATE TABLE `ad_unit` (
+CREATE TABLE if not exists `ad_unit` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `plan_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '关联推广计划 id',
   `unit_name` varchar(48) NOT NULL COMMENT '推广单元名称',
@@ -46,7 +46,7 @@ CREATE TABLE `ad_unit` (
 
 
 -- 创意表
-CREATE TABLE `ad_creative` (
+CREATE TABLE if not exists `ad_creative` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `name` varchar(48) NOT NULL COMMENT '创意名称',
   `type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '物料类型(图片, 视频)',
@@ -65,7 +65,7 @@ CREATE TABLE `ad_creative` (
 
 
 -- 创意与推广单元的关联表
-CREATE TABLE `creative_unit` (
+CREATE TABLE if not exists `creative_unit` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `creative_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '创意 id',
   `unit_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '推广单元 id',
@@ -74,7 +74,7 @@ CREATE TABLE `creative_unit` (
 
 
 -- 推广单元关键词 Feature
-CREATE TABLE `ad_unit_keyword` (
+CREATE TABLE if not exists `ad_unit_keyword` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `unit_id` int(11) NOT NULL COMMENT '推广单元 id',
   `keyword` varchar(30) NOT NULL COMMENT '关键词',
@@ -83,7 +83,7 @@ CREATE TABLE `ad_unit_keyword` (
 
 
 -- 推广单元兴趣 Feature
-CREATE TABLE `ad_unit_it` (
+CREATE TABLE if not exists `ad_unit_it` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `unit_id` int(11) NOT NULL COMMENT '推广单元 id',
   `it_tag` varchar(30) NOT NULL COMMENT '兴趣标签',
@@ -92,7 +92,7 @@ CREATE TABLE `ad_unit_it` (
 
 
 -- 推广单元地域 Feature
-CREATE TABLE `ad_unit_district` (
+CREATE TABLE if not exists `ad_unit_district` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `unit_id` int(11) NOT NULL COMMENT '推广单元 id',
   `province` varchar(30) NOT NULL COMMENT '省',
