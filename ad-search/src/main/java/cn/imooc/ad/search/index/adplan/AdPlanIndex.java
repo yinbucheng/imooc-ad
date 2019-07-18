@@ -2,10 +2,16 @@ package cn.imooc.ad.search.index.adplan;
 
 import cn.imooc.ad.search.index.IndexAware;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 /**
  * Created by Qinyi.
@@ -14,45 +20,41 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class AdPlanIndex implements IndexAware<Long, AdPlanObject> {
 
-    private static Map<Long, AdPlanObject> objectMap;
+    @Autowired
+    private ElasticsearchTemplate esTemplate;
 
-    static {
-        objectMap = new ConcurrentHashMap<>();
-    }
 
     @Override
     public AdPlanObject get(Long key) {
-        return objectMap.get(key);
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(matchAllQuery())
+                .withFilter(QueryBuilders.boolQuery().must(QueryBuilders.termQuery("id", key)))
+                .build();
+        List<AdPlanObject> adPlanObjects = esTemplate.queryForList(searchQuery, AdPlanObject.class);
+        if (CollectionUtils.isEmpty(adPlanObjects)) {
+            return null;
+        }
+        return adPlanObjects.get(0);
     }
 
     @Override
     public void add(Long key, AdPlanObject value) {
-
-        log.info("before add: {}", objectMap);
-        objectMap.put(key, value);
-        log.info("after add: {}", objectMap);
+        IndexQuery indexQuery = new IndexQueryBuilder().withIndexName("ad_plan")
+                .withType("ad_plan").withId(key + "").withObject(value).build();
+        esTemplate.index(indexQuery);
     }
 
     @Override
     public void update(Long key, AdPlanObject value) {
-
-        log.info("before update: {}", objectMap);
-
-        AdPlanObject oldObject = objectMap.get(key);
-        if (null == oldObject) {
-            objectMap.put(key, value);
-        } else {
-            oldObject.update(value);
-        }
-
-        log.info("after update: {}", objectMap);
+        IndexQuery indexQuery = new IndexQueryBuilder().withIndexName("ad_plan")
+                .withType("ad_plan").withId(key + "").withObject(value).build();
+        esTemplate.index(indexQuery);
     }
 
     @Override
     public void delete(Long key, AdPlanObject value) {
-
-        log.info("before delete: {}", objectMap);
-        objectMap.remove(key);
-        log.info("after delete: {}", objectMap);
+        DeleteQuery deleteQuery = new DeleteQuery();
+        deleteQuery.setQuery(QueryBuilders.termQuery("id", key));
+        esTemplate.delete(deleteQuery);
     }
 }
