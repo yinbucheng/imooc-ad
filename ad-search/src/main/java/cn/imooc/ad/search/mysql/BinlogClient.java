@@ -5,6 +5,7 @@ import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -16,12 +17,11 @@ import java.io.IOException;
 @Component
 public class BinlogClient {
 
-    @Autowired
     private BinaryLogClient client;
     @Autowired
-    private  BinlogConfig config;
+    private BinlogConfig config;
     @Autowired
-    private  AggregationListener listener;
+    private AggregationListener listener;
 
 
     public void connect() {
@@ -36,6 +36,7 @@ public class BinlogClient {
 
             if (!StringUtils.isEmpty(config.getBinlogName()) &&
                     !config.getPosition().equals(-1L)) {
+                log.info("---------set binlog file and position-----------");
                 client.setBinlogFilename(config.getBinlogName());
                 client.setBinlogPosition(config.getPosition());
             }

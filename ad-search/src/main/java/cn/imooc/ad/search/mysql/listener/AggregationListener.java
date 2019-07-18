@@ -58,7 +58,7 @@ public class AggregationListener implements BinaryLogClient.EventListener {
 
     @Override
     public void onEvent(Event event) {
-
+         log.info("binlog happen event..............");
         EventType type = event.getHeader().getEventType();
         log.debug("event type: {}", type);
 

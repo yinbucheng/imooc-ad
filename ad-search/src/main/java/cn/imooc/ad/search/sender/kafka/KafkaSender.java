@@ -3,6 +3,7 @@ package cn.imooc.ad.search.sender.kafka;
 import cn.imooc.ad.search.mysql.dto.MySqlRowData;
 import cn.imooc.ad.search.sender.ISender;
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import java.util.Optional;
  * Created by Qinyi.
  */
 @Component("kafkaSender")
+@Slf4j
 public class KafkaSender implements ISender {
 
     @Value("${adconf.kafka.topic}")
@@ -31,8 +33,10 @@ public class KafkaSender implements ISender {
     @Override
     public void sender(MySqlRowData rowData) {
 
+        String content = JSON.toJSONString(rowData);
+        log.info("begin send data to kafka topic " + topic + " content:" + content);
         kafkaTemplate.send(
-                topic, JSON.toJSONString(rowData)
+                topic, content
         );
     }
 
@@ -46,7 +50,7 @@ public class KafkaSender implements ISender {
                     message.toString(),
                     MySqlRowData.class
             );
-            System.out.println("kafka processMysqlRowData: " +
+            log.info("kafka topic:ad-search-mysql-data  groupId:ad-search processMysqlRowData: " +
                     JSON.toJSONString(rowData));
         }
     }
