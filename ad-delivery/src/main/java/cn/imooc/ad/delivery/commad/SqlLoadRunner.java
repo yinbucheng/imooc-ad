@@ -36,7 +36,7 @@ import java.util.List;
  * @modified By：
  * @version:
  */
-@Component
+//@Component
 @Order(-Integer.MAX_VALUE)
 public class SqlLoadRunner implements CommandLineRunner, EnvironmentAware, BeanFactoryAware, ApplicationContextAware {
 
