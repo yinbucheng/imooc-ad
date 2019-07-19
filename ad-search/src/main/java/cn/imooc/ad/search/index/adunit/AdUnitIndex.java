@@ -2,11 +2,15 @@ package cn.imooc.ad.search.index.adunit;
 
 import cn.imooc.ad.search.index.IndexAware;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Created by Qinyi.
@@ -15,79 +19,49 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class AdUnitIndex implements IndexAware<Long, AdUnitObject> {
 
-    private static Map<Long, AdUnitObject> objectMap;
+    @Autowired
+    private ElasticsearchTemplate esTemplate;
 
-    static {
-        objectMap = new ConcurrentHashMap<>();
-    }
+
 
     public Set<Long> match(Integer positionType) {
-
-        Set<Long> adUnitIds = new HashSet<>();
-
-        objectMap.forEach((k, v) -> {
-            if (AdUnitObject.isAdSlotTypeOK(positionType,
-                    v.getPositionType())) {
-                adUnitIds.add(k);
-            }
-        });
-
-        return adUnitIds;
+        SearchQuery query = new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchQuery("position_type",positionType)).build();
+        List<AdUnitObject> adUnitObjects = esTemplate.queryForList(query, AdUnitObject.class);
+        if(CollectionUtils.isEmpty(adUnitObjects))
+            return null;
+        return adUnitObjects.stream().map(AdUnitObject::getUnitId).collect(Collectors.toSet());
     }
 
-    public List<AdUnitObject> fetch(Collection<Long> adUnitIds) {
-
-        if (CollectionUtils.isEmpty(adUnitIds)) {
-            return Collections.emptyList();
-        }
-
-        List<AdUnitObject> result = new ArrayList<>();
-
-        adUnitIds.forEach(u -> {
-            AdUnitObject object = get(u);
-            if (object == null) {
-                log.error("AdUnitObject not found: {}", u);
-                return;
-            }
-            result.add(object);
-        });
-
-        return result;
-    }
 
     @Override
     public AdUnitObject get(Long key) {
-        return objectMap.get(key);
+        SearchQuery query = new NativeSearchQueryBuilder().withQuery(QueryBuilders.boolQuery().must(QueryBuilders.termQuery("id",key))).build();
+        List<AdUnitObject> adUnitObjects = esTemplate.queryForList(query, AdUnitObject.class);
+        if(CollectionUtils.isEmpty(adUnitObjects))
+            return null;
+        return adUnitObjects.get(0);
     }
 
     @Override
     public void add(Long key, AdUnitObject value) {
 
-        log.info("before add: {}", objectMap);
-        objectMap.put(key, value);
-        log.info("after add: {}", objectMap);
+        IndexQuery indexQuery = new IndexQueryBuilder().withIndexName("ad_unit")
+                .withType("ad_unit").withId(key + "").withObject(value).build();
+        esTemplate.index(indexQuery);
     }
 
     @Override
     public void update(Long key, AdUnitObject value) {
 
-        log.info("before update: {}", objectMap);
-
-        AdUnitObject oldObject = objectMap.get(key);
-        if (null == oldObject) {
-            objectMap.put(key, value);
-        } else {
-            oldObject.update(value);
-        }
-
-        log.info("after update: {}", objectMap);
+        IndexQuery indexQuery = new IndexQueryBuilder().withIndexName("ad_unit")
+                .withType("ad_unit").withId(key + "").withObject(value).build();
+        esTemplate.index(indexQuery);
     }
 
     @Override
     public void delete(Long key, AdUnitObject value) {
-
-        log.info("before delete: {}", objectMap);
-        objectMap.remove(key);
-        log.info("after delete: {}", objectMap);
+        DeleteQuery deleteQuery = new DeleteQuery();
+        deleteQuery.setQuery(QueryBuilders.termQuery("id", key));
+        esTemplate.delete(deleteQuery,AdUnitObject.class);
     }
 }

@@ -55,6 +55,6 @@ public class AdPlanIndex implements IndexAware<Long, AdPlanObject> {
     public void delete(Long key, AdPlanObject value) {
         DeleteQuery deleteQuery = new DeleteQuery();
         deleteQuery.setQuery(QueryBuilders.termQuery("id", key));
-        esTemplate.delete(deleteQuery);
+        esTemplate.delete(deleteQuery,AdPlanObject.class);
     }
 }
