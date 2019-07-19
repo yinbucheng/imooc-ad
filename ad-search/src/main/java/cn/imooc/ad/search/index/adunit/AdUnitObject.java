@@ -4,6 +4,8 @@ import cn.imooc.ad.search.index.adplan.AdPlanObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 /**
  * Created by Qinyi.
@@ -11,8 +13,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(indexName = "ad_unit",type = "ad_unit")
 public class AdUnitObject {
-
+   @Id
     private Long unitId;
     private Integer unitStatus;
     private Integer positionType;

@@ -3,6 +3,8 @@ package cn.imooc.ad.search.index.adplan;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.Date;
 
@@ -12,8 +14,10 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(indexName = "ad_plan",type = "ad_plan")
 public class AdPlanObject {
 
+    @Id
     private Long planId;
     private Long userId;
     private Integer planStatus;

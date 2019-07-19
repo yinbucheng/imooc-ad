@@ -3,6 +3,8 @@ package cn.imooc.ad.search.index.creative;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 /**
  * Created by Qinyi.
@@ -10,8 +12,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(indexName = "add_creative", type = "add_creative")
 public class CreativeObject {
-
+    @Id
     private Long adId;
     private String name;
     private Integer type;

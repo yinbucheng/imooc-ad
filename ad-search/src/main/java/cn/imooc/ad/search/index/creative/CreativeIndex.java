@@ -2,6 +2,10 @@ package cn.imooc.ad.search.index.creative;
 
 import cn.imooc.ad.search.index.IndexAware;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -19,11 +23,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class CreativeIndex implements IndexAware<Long, CreativeObject> {
 
-    private static Map<Long, CreativeObject> objectMap;
+    @Autowired
+    private ElasticsearchTemplate template;
 
-    static {
-        objectMap = new ConcurrentHashMap<>();
-    }
 
     public List<CreativeObject> fetch(Collection<Long> adIds) {
 
@@ -31,54 +33,34 @@ public class CreativeIndex implements IndexAware<Long, CreativeObject> {
             return Collections.emptyList();
         }
 
-        List<CreativeObject> result = new ArrayList<>();
-
-        adIds.forEach(u -> {
-            CreativeObject object = get(u);
-            if (null == object) {
-                log.error("CreativeObject not found: {}", u);
-                return;
-            }
-
-            result.add(object);
-        });
-
-        return result;
+        SearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(QueryBuilders.termQuery("id", adIds)).build();
+        List<CreativeObject> creativeObjects = template.queryForList(searchQuery, CreativeObject.class);
+        return creativeObjects;
     }
 
     @Override
     public CreativeObject get(Long key) {
-        return objectMap.get(key);
+        GetQuery query = new GetQuery();
+        query.setId(key + "");
+        return template.queryForObject(query, CreativeObject.class);
     }
 
     @Override
     public void add(Long key, CreativeObject value) {
-
-        log.info("before add: {}", objectMap);
-        objectMap.put(key, value);
-        log.info("after add: {}", objectMap);
+        IndexQuery query = new IndexQueryBuilder().withId(key + "").withObject(value).build();
+        template.index(query);
     }
 
     @Override
     public void update(Long key, CreativeObject value) {
-
-        log.info("before update: {}", objectMap);
-
-        CreativeObject oldObject = objectMap.get(key);
-        if (null == oldObject) {
-            objectMap.put(key, value);
-        } else {
-            oldObject.update(value);
-        }
-
-        log.info("after update: {}", objectMap);
+        IndexQuery query = new IndexQueryBuilder().withId(key + "").withObject(value).build();
+        template.index(query);
     }
 
     @Override
     public void delete(Long key, CreativeObject value) {
-
-        log.info("before delete: {}", objectMap);
-        objectMap.remove(key);
-        log.info("after delete: {}", objectMap);
+        DeleteQuery query = new DeleteQuery();
+        query.setQuery(QueryBuilders.boolQuery().must(QueryBuilders.termQuery("id", 1)));
+        template.delete(query, CreativeObject.class);
     }
 }
